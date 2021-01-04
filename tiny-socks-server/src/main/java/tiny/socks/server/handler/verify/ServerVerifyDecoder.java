@@ -37,13 +37,15 @@ public class ServerVerifyDecoder extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+        byte version;
+        byte methodCount;
         switch (verifyStatus){
             case WAIT_VERIFY_STATUS:
                 if(!in.isReadable(2)){
                     return;
                 }
-                byte version = in.readByte();
-                byte methodCount = in.readByte();
+                version = in.readByte();
+                methodCount = in.readByte();
                 if(in.readableBytes()<methodCount){
                     in.clear();
                     return;
@@ -60,7 +62,12 @@ public class ServerVerifyDecoder extends ByteToMessageDecoder {
                 this.verifyStatus = VERIFYING_STATUS;
                 break;
             case VERIFYING_STATUS:
-
+                if(!in.isReadable(4)){
+                    return;
+                }
+                version = in.readByte();
+                methodCount = in.readByte();
+                return;
             case VERIFIED_STATUS:
 
             default:

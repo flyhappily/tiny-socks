@@ -1,11 +1,14 @@
 package tiny.socks.client.handler.verify;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tiny.socks.base.utils.NumberUtil;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -30,6 +33,11 @@ public class ClientVerifyDecoder extends ByteToMessageDecoder {
 
     private int verifyStatus;
 
+    private final String userName = "xu";
+
+    private final String password = "123";
+
+
     public ClientVerifyDecoder(){
         this.verifyStatus = WAIT_VERIFY_STATUS;
     }
@@ -46,17 +54,50 @@ public class ClientVerifyDecoder extends ByteToMessageDecoder {
                 logger.error("错误数据为：{}",in.readByte());
                 break;
             case WAIT_VERIFY_METHOD_STATUS:
-                if(in.isReadable(2)){
-                    byte version = in.readByte();
-                    byte methodCount = in.readByte();
-                    byte [] methods = new byte[methodCount];
-                    in.readBytes(methods);
-                    logger.debug("版本号：{}，验证方法数量：{}",version,methodCount);
+                if(in.readableBytes()<3){
+                    return;
                 }
-                return;
+                byte version = in.readByte();
+                byte methodCount = in.readByte();
+                if(in.readableBytes()<methodCount){
+                    in.clear();
+                    return;
+                }
+                byte [] methods = new byte[methodCount];
+                in.readBytes(methods);
+                logger.debug("服务端响应验证方法，版本号：{}，验证方法数量：{}，methods:{}",version,methodCount,methods);
+                //TODO 选择合适方法
+                //用户名密码验证方式
+                if(checkUserAndPasswordMethod(methods)){
+                    byte [] authInfo = (userName +"\n"+ password).getBytes(StandardCharsets.US_ASCII.name());
+                    ByteBuf byteBuf = Unpooled.buffer(4+authInfo.length);
+                    byteBuf.writeByte(0x01);
+                    byteBuf.writeByte(0x01);
+                    if(authInfo.length<=Short.MAX_VALUE){
+                        byteBuf.writeBytes(NumberUtil.shortToBytes((short) authInfo.length));
+                        byteBuf.writeBytes(authInfo);
+                        ctx.writeAndFlush(byteBuf);
+                        this.verifyStatus = VERIFYING_STATUS;
+                        return;
+                    }
+                }
+
+
+
             default:
                 break;
         }
         ctx.close();
     }
+
+    private boolean checkUserAndPasswordMethod(byte [] methods){
+        for(byte method : methods){
+            if(method==0x01){
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 }

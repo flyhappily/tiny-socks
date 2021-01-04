@@ -11,13 +11,13 @@
     <modules>
         <module>tiny-socks-server</module>
         <module>tiny-socks-client</module>
-        <module>tiny-socks-common</module>
         <module>tiny-socks-base</module>
     </modules>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <tiny-socks-base.version>1.0-SNAPSHOT</tiny-socks-base.version>
         <netty.version>4.1.55.Final</netty.version>
         <slf4j.version>1.7.30</slf4j.version>
         <log4j.version>2.13.3</log4j.version>
@@ -26,6 +26,11 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>tiny</groupId>
+                <artifactId>tiny-socks-base</artifactId>
+                <version>${tiny-socks-base.version}</version>
+            </dependency>
             <!--netty-->
             <dependency>
                 <groupId>io.netty</groupId>

@@ -20,7 +20,7 @@
 
 |  VER   | METHOD | LENGTH  |      DATA       |
 | :----: | :----: | :-----: | :-------------: |
-| 1 byte | 1 byte | 4 bytes | Variable length |
+| 1 byte | 1 byte | 2 bytes | Variable length |
 
 - LENGTH 验证信息的长度
 - DATA验证信息数据

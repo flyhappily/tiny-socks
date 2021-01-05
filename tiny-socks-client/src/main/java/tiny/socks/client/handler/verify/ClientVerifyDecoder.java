@@ -81,12 +81,27 @@ public class ClientVerifyDecoder extends ByteToMessageDecoder {
                         return;
                     }
                 }
-
-
-
+                break;
+            case VERIFYING_STATUS:
+                if(in.readableBytes()<2){
+                    return;
+                }
+                version = in.readByte();
+                byte result = in.readByte();
+                logger.info("服务器验证结果为：version={},result={}",version,result);
+                if(result==0x01){
+                    verifyStatus = VERIFIED_STATUS;
+                    return;
+                }
+                break;
+            case VERIFIED_STATUS:
+                out.add(in);
+                break;
             default:
                 break;
         }
+        in.skipBytes(in.readableBytes());
+        logger.error("验证过程出现异常，关闭通道");
         ctx.close();
     }
 

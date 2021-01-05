@@ -7,10 +7,15 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tiny.socks.server.handler.IdleStateDoorHandler;
 import tiny.socks.server.handler.verify.ServerVerifyDecoder;
 import tiny.socks.base.encoder.ObjectEncoder;
+
+import java.util.concurrent.TimeUnit;
+
 /**
  * @author: pf_xu
  * @date: 2021/1/2 23:19
@@ -45,6 +50,8 @@ public class Server{
                     // ChannelInitializer初始化通道SocketChannel
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
+                            socketChannel.pipeline().addLast(new IdleStateHandler(5,5,0, TimeUnit.SECONDS));
+                            socketChannel.pipeline().addLast(new IdleStateDoorHandler());
                             socketChannel.pipeline().addLast(new ObjectEncoder());
                             socketChannel.pipeline().addLast(new ServerVerifyDecoder());
                         }

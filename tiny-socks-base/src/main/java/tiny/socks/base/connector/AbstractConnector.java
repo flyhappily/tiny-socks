@@ -62,12 +62,15 @@ public abstract class AbstractConnector implements Connector {
 
             //连接服务器
             this.channelFuture = client.connect(this.host, this.port).sync();
-        } catch (InterruptedException e) {
+            this.initVerifyMessageSend();
+            this.channelFuture.channel().closeFuture().sync();
+            this.shutdown();
+        } catch (Exception e) {
             group.shutdownGracefully();
             logger.error("create connector failed, [host:port]=[{}:{}]",this.host,this.port);
             Thread.currentThread().interrupt();
         }
-        this.initVerifyMessageSend();
+
     }
 
     protected abstract void initVerifyMessageSend();

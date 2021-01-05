@@ -1,9 +1,11 @@
 package tiny.socks.client;
 
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import tiny.socks.base.connector.AbstractConnector;
-import tiny.socks.client.handler.verify.ClientVerifyDecoder;
+import tiny.socks.base.connector.exception.ConnectorException;
 import tiny.socks.base.encoder.ObjectEncoder;
+import tiny.socks.client.handler.verify.ClientVerifyDecoder;
 
 import java.util.List;
 
@@ -16,9 +18,7 @@ public class LocalConnector extends AbstractConnector {
 
     private ClientVerifyDecoder clientVerifyDecoder;
 
-    protected LocalConnector(String host, int port) {
-        super(host, port);
-    }
+    private ChannelFuture channelFuture;
 
     @Override
     protected void addChannelHandlers(List<ChannelHandler> channelHandlers) {
@@ -27,8 +27,19 @@ public class LocalConnector extends AbstractConnector {
         channelHandlers.add(this.clientVerifyDecoder);
     }
 
-    @Override
-    protected void initVerifyMessageSend() {
+    public void doConnect(String host, int port) throws ConnectorException {
+        ChannelFuture future = this.connect(host,port);
+        if(future == null){
+            throw new ConnectorException("connect host:port ["+host+":"+port+"] failed");
+        }
+        this.channelFuture = future;
+    }
+
+    protected void write (byte[] bytes){
+        this.channelFuture.channel().writeAndFlush(bytes);
+    }
+
+    protected void start() {
         byte [] bytes = new byte[3];
         bytes[0] = 0x01;
         bytes[1] = 0x01;

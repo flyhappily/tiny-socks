@@ -1,5 +1,7 @@
 package tiny.socks.base.connector;
 
+import io.netty.channel.ChannelFuture;
+
 /**
  * @author: pf_xu
  * @date: 2021/1/3 0:10
@@ -7,9 +9,7 @@ package tiny.socks.base.connector;
  */
 public interface Connector {
 
-    void connect();
-
-    void write(byte[] bytes);
+    ChannelFuture connect(String host, int port);
 
     void shutdown();
 

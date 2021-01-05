@@ -1,10 +1,7 @@
 package tiny.socks.base.connector;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
@@ -22,62 +19,34 @@ public abstract class AbstractConnector implements Connector {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractConnector.class);
 
-    private EventLoopGroup group;
+    private final Bootstrap bootstrap;
 
-    private final String host;
-
-    private final int port;
+    private final EventLoopGroup group;
 
     protected List<ChannelHandler> channelHandlers = new ArrayList<>();
 
-    protected ChannelFuture channelFuture;
-
-    protected AbstractConnector(String host, int port) {
-        this.host = host;
-        this.port = port;
+    protected AbstractConnector() {
         this.addChannelHandlers(channelHandlers);
+        if (channelHandlers.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+        this.bootstrap = new Bootstrap();
+        this.group = new NioEventLoopGroup();
+        this.bootstrap.group(group);
+        this.bootstrap.channel(NioSocketChannel.class);
+        ConnectorChannelInitializer connectorChannelInitializer = new ConnectorChannelInitializer(this.channelHandlers);
+        this.bootstrap.handler(connectorChannelInitializer);
     }
 
     protected abstract void addChannelHandlers(List<ChannelHandler> channelHandlers);
 
-
-    public final void connect(){
-        if (channelHandlers.isEmpty()) {
-            throw new IllegalArgumentException();
-        }
-        // 首先，netty通过ServerBootstrap启动服务端
-        Bootstrap client = new Bootstrap();
-
-        //第1步 定义线程组，处理读写和链接事件，没有了accept事件
-        this.group = new NioEventLoopGroup();
+    public final ChannelFuture connect(String host, int port){
         try {
-            client.group(group);
-
-            //第2步 绑定客户端通道
-            client.channel(NioSocketChannel.class);
-
-            //第3步 给NIoSocketChannel初始化handler， 处理读写事件
-            ConnectorChannelInitializer connectorChannelInitializer = new ConnectorChannelInitializer(this.channelHandlers);
-            client.handler(connectorChannelInitializer);
-
-            //连接服务器
-            this.channelFuture = client.connect(this.host, this.port).sync();
-            this.initVerifyMessageSend();
-            this.channelFuture.channel().closeFuture().sync();
-            this.shutdown();
+            return this.bootstrap.connect(host, port).sync();
         } catch (Exception e) {
-            group.shutdownGracefully();
-            logger.error("create connector failed, [host:port]=[{}:{}]",this.host,this.port);
-            Thread.currentThread().interrupt();
+            logger.error("create connector failed, [host:port]=[{}:{}]",host,port);
+            return null;
         }
-
-    }
-
-    protected abstract void initVerifyMessageSend();
-
-    @Override
-    public final void write(byte[] bytes){
-        this.channelFuture.channel().writeAndFlush(bytes);
     }
 
     @Override

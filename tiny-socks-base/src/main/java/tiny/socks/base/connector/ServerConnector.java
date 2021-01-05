@@ -11,17 +11,9 @@ import java.util.List;
  */
 public class ServerConnector extends AbstractConnector{
 
-    protected ServerConnector(String host, int port) {
-        super(host, port);
-    }
 
     @Override
     protected void addChannelHandlers(List<ChannelHandler> channelHandlers) {
-
-    }
-
-    @Override
-    protected void initVerifyMessageSend() {
 
     }
 

@@ -66,13 +66,14 @@ public class ServerVerifyDecoder extends ByteToMessageDecoder {
                 version = in.readByte();
                 byte method = in.readByte();
                 byte [] lengthBytes = new byte[2];
+                in.readBytes(lengthBytes);
                 short length = NumberUtil.bytesToShort(lengthBytes);
                 if(in.readableBytes()<length){
                     in.clear();
                     return;
                 }
                 byte[] dataBytes = new byte[length];
-                in.readBytes(length);
+                in.readBytes(dataBytes);
                 String authInfo = new String(dataBytes, StandardCharsets.US_ASCII);
                 logger.info("读取到客户端发送的验证信息，version={},method={},authInfo={}"
                         ,version,method,authInfo);
@@ -88,6 +89,8 @@ public class ServerVerifyDecoder extends ByteToMessageDecoder {
                 out.add(in);
                 break;
             default:
+                logger.error("验证失败，关闭channel");
+                ctx.close();
                 break;
         }
     }

@@ -2,10 +2,11 @@ package tiny.socks.base;
 
 /**
  * @author: pf_xu
- * @date: 2021/1/2 23:28
+ * @date: 2021/1/6 12:44
  * @Email:pfxuchn@gmail.com
  */
-public class RelayChannel {
+public interface LifeCycle {
 
+    void shutdown();
 
 }

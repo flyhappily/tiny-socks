@@ -1,6 +1,7 @@
 package tiny.socks.server.handler.verify;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.slf4j.Logger;
@@ -54,9 +55,8 @@ public class ServerVerifyDecoder extends ByteToMessageDecoder {
                 resp[0] = 0x01;
                 resp[1] = 0x01;
                 resp[2] = 0x01;
-                //addListener(ChannelFutureListener.CLOSE)
                 ctx.writeAndFlush(resp);
-                logger.info("给客户端响应支持的验证方法,version={},resp={}",version,resp);
+                logger.debug("给客户端响应支持的验证方法,version={},resp={}",version,resp);
                 this.verifyStatus = VERIFYING_STATUS;
                 break;
             case VERIFYING_STATUS:
@@ -75,15 +75,19 @@ public class ServerVerifyDecoder extends ByteToMessageDecoder {
                 byte[] dataBytes = new byte[length];
                 in.readBytes(dataBytes);
                 String authInfo = new String(dataBytes, StandardCharsets.US_ASCII);
-                logger.info("读取到客户端发送的验证信息，version={},method={},authInfo={}"
+                logger.debug("读取到客户端发送的验证信息，version={},method={},authInfo={}"
                         ,version,method,authInfo);
                 //发送验证结果
                 byte [] result = new byte[2];
                 result[0] = 0x01;
+                //校验成功
+
                 result[1] = 0x01;
-                logger.info("给客户端发送验证结果，result={}",result);
+                logger.debug("给客户端发送验证结果，result={}",result);
                 ctx.writeAndFlush(result);
                 this.verifyStatus = VERIFIED_STATUS;
+                logger.info("verified, begin to transmit data remoteAddress:{},localAddress:{}"
+                        ,ctx.channel().remoteAddress(),ctx.channel().localAddress());
                 return;
             case VERIFIED_STATUS:
                 out.add(in);

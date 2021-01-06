@@ -2,9 +2,11 @@ package tiny.socks.client;
 
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
+import io.netty.handler.timeout.IdleStateHandler;
 import tiny.socks.base.connector.AbstractConnector;
 import tiny.socks.base.connector.exception.ConnectorException;
 import tiny.socks.base.encoder.ObjectEncoder;
+import tiny.socks.client.handler.LocalIdleStateHandler;
 import tiny.socks.client.handler.verify.ClientVerifyDecoder;
 
 import java.util.List;
@@ -22,6 +24,8 @@ public class LocalConnector extends AbstractConnector {
 
     @Override
     protected void addChannelHandlers(List<ChannelHandler> channelHandlers) {
+        channelHandlers.add(new IdleStateHandler(8,6,0));
+        channelHandlers.add(new LocalIdleStateHandler());
         channelHandlers.add(new ObjectEncoder());
         this.clientVerifyDecoder = new ClientVerifyDecoder();
         channelHandlers.add(this.clientVerifyDecoder);

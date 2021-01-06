@@ -88,9 +88,11 @@ public class ClientVerifyDecoder extends ByteToMessageDecoder {
                 }
                 version = in.readByte();
                 byte result = in.readByte();
-                logger.info("服务器验证结果为：version={},result={}",version,result);
+                logger.debug("服务器验证结果为：version={},result={}",version,result);
                 if(result==0x01){
                     verifyStatus = VERIFIED_STATUS;
+                    logger.info("verified, begin to transmit data remoteAddress:{},localAddress:{}"
+                            ,ctx.channel().remoteAddress(),ctx.channel().localAddress());
                     return;
                 }
                 break;

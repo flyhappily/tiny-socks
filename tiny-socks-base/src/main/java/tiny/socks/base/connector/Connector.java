@@ -11,6 +11,4 @@ public interface Connector {
 
     ChannelFuture connect(String host, int port);
 
-    void shutdown();
-
 }

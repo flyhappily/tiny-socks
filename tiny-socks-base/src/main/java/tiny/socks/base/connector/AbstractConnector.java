@@ -6,6 +6,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tiny.socks.base.LifeCycle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,11 +16,9 @@ import java.util.List;
  * @date: 2021/1/2 23:44
  * @Email:pfxuchn@gmail.com
  */
-public abstract class AbstractConnector implements Connector {
+public abstract class AbstractConnector implements Connector, LifeCycle {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractConnector.class);
-
-    private final Bootstrap bootstrap;
 
     private final EventLoopGroup group;
 
@@ -28,23 +27,22 @@ public abstract class AbstractConnector implements Connector {
     protected AbstractConnector() {
         this.addChannelHandlers(channelHandlers);
         if (channelHandlers.isEmpty()) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("channelHandlers should be configured correctly");
         }
-        this.bootstrap = new Bootstrap();
         this.group = new NioEventLoopGroup();
-        this.bootstrap.group(group);
-        this.bootstrap.channel(NioSocketChannel.class);
-        ConnectorChannelInitializer connectorChannelInitializer = new ConnectorChannelInitializer(this.channelHandlers);
-        this.bootstrap.handler(connectorChannelInitializer);
     }
 
     protected abstract void addChannelHandlers(List<ChannelHandler> channelHandlers);
 
     public final ChannelFuture connect(String host, int port){
+        Bootstrap bootstrap = new Bootstrap();
+        bootstrap.group(group)
+                .channel(NioSocketChannel.class)
+                .handler(new ConnectorChannelInitializer(this.channelHandlers));
         try {
-            return this.bootstrap.connect(host, port).sync();
+            return bootstrap.connect(host, port).sync();
         } catch (Exception e) {
-            logger.error("create connector failed, [host:port]=[{}:{}]",host,port);
+            logger.error("connect [host:port]=[{}:{}] failed",host,port);
             return null;
         }
     }

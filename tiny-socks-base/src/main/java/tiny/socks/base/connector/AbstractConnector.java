@@ -18,39 +18,35 @@ import java.util.List;
  */
 public abstract class AbstractConnector implements Connector, LifeCycle {
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractConnector.class);
-
-    private final EventLoopGroup group;
-
-    protected List<ChannelHandler> channelHandlers = new ArrayList<>();
+    protected final EventLoopGroup group;
 
     protected AbstractConnector() {
-        this.addChannelHandlers(channelHandlers);
-        if (channelHandlers.isEmpty()) {
-            throw new IllegalArgumentException("channelHandlers should be configured correctly");
-        }
         this.group = new NioEventLoopGroup();
     }
-
-    protected abstract void addChannelHandlers(List<ChannelHandler> channelHandlers);
 
     public final ChannelFuture connect(String host, int port){
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.group(group)
                 .channel(NioSocketChannel.class)
-                .handler(new ConnectorChannelInitializer(this.channelHandlers));
-        try {
-            return bootstrap.connect(host, port).sync();
-        } catch (Exception e) {
-            logger.error("connect [host:port]=[{}:{}] failed",host,port);
-            return null;
-        }
+                .handler(new ConnectorChannelInitializer(this.loadHandlers()));
+        return bootstrap.connect(host, port);
     }
 
     @Override
     public void shutdown(){
         this.group.shutdownGracefully();
     }
+
+    private  List<ChannelHandler> loadHandlers(){
+        List<ChannelHandler> channelHandlers = new ArrayList<>();
+        this.addChannelHandlers(channelHandlers);
+        if (channelHandlers.isEmpty()) {
+            throw new IllegalArgumentException("channelHandlers should be configured correctly");
+        }
+        return channelHandlers;
+    }
+
+    protected abstract void addChannelHandlers(List<ChannelHandler> channelHandlers);
 
     private static class ConnectorChannelInitializer extends ChannelInitializer<NioSocketChannel> {
 

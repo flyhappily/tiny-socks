@@ -15,5 +15,5 @@ Tiny socks proxy
 ### tiny-socks-client
 客户端
 
-### tiny-socks-server
+### tiny-socks-remoteServer
 服务端

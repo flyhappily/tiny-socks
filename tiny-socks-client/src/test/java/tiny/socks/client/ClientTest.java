@@ -1,6 +1,7 @@
 package tiny.socks.client;
 
 import tiny.socks.base.connector.exception.ConnectorException;
+import tiny.socks.client.connector.LocalConnector;
 
 /**
  * @author: pf_xu
@@ -10,8 +11,8 @@ import tiny.socks.base.connector.exception.ConnectorException;
 public class ClientTest {
 
     public static void main(String[] args) throws ConnectorException {
-        LocalConnector localConnector = new LocalConnector();
-        localConnector.doConnect("127.0.0.1",7979);
+        LocalConnector localConnector = new LocalConnector("127.0.0.1",7979);
+        localConnector.start();
     }
 
 }

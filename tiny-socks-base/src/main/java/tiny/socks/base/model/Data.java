@@ -1,4 +1,4 @@
-package tiny.socks.base.data;
+package tiny.socks.base.model;
 
 import io.netty.buffer.ByteBuf;
 

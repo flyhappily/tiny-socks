@@ -1,4 +1,4 @@
-package tiny.socks.client.handler;
+package tiny.socks.client;
 
 /**
  * @author: pf_xu

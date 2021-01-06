@@ -1,4 +1,4 @@
-package tiny.socks.server.handler;
+package tiny.socks.server.server.handler;
 
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
  * @Email:pfxuchn@gmail.com
  */
 public class IdleStateDoorHandler extends ChannelDuplexHandler {
+
+    public static final String NAME = "idleStateDoorHandler";
 
     private static final Logger logger = LoggerFactory.getLogger(IdleStateDoorHandler.class);
 

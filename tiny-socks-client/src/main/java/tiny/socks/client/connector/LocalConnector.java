@@ -1,4 +1,4 @@
-package tiny.socks.client;
+package tiny.socks.client.connector;
 
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -7,10 +7,10 @@ import io.netty.handler.timeout.IdleStateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tiny.socks.base.connector.AbstractConnector;
-import tiny.socks.base.encoder.ObjectEncoder;
+import tiny.socks.base.ObjectEncoder;
 import tiny.socks.base.model.RemoteAddress;
-import tiny.socks.client.handler.LocalIdleStateHandler;
-import tiny.socks.client.handler.verify.ClientVerifyDecoder;
+import tiny.socks.client.connector.handler.LocalIdleStateHandler;
+import tiny.socks.client.connector.handler.verify.LocalConnectorVerifyDecoder;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -24,34 +24,28 @@ public class LocalConnector extends AbstractConnector {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalConnector.class);
 
-    private ClientVerifyDecoder clientVerifyDecoder;
-
     private ChannelFuture channelFuture;
 
-    private RemoteAddress remoteAddress;
+    private final RemoteAddress remoteAddress;
+
+    public LocalConnector(String host,int port){
+        remoteAddress = new RemoteAddress(host,port);
+    }
+
 
     @Override
     protected void addChannelHandlers(List<ChannelHandler> channelHandlers) {
         channelHandlers.add(new IdleStateHandler(0,0,5));
         channelHandlers.add(new LocalIdleStateHandler(this));
         channelHandlers.add(new ObjectEncoder());
-        this.clientVerifyDecoder = new ClientVerifyDecoder();
-        channelHandlers.add(this.clientVerifyDecoder);
+        channelHandlers.add(new LocalConnectorVerifyDecoder());
     }
-
 
     public void doConnect(){
-        if(remoteAddress!=null){
-            this.doConnect(remoteAddress.getHost(),remoteAddress.getPort());
-        }else {
-            logger.error("remote address is null");
-        }
+        this.doConnect(remoteAddress.getHost(),remoteAddress.getPort());
     }
 
-    protected void doConnect(String host, int port){
-        if(remoteAddress==null){
-            remoteAddress = new RemoteAddress(host,port);
-        }
+    public void doConnect(String host, int port){
         if(channelFuture!=null
                 &&channelFuture.channel() != null
                 && channelFuture.channel().isActive()) {
@@ -62,17 +56,23 @@ public class LocalConnector extends AbstractConnector {
     }
 
     public void doWhenConnected(){
-        this.start();
+        byte [] bytes = new byte[3];
+        bytes[0] = 0x01;
+        bytes[1] = 0x01;
+        bytes[2] = 0x02;
+        this.write(bytes);
+        LocalConnectorVerifyDecoder localConnectorVerifyDecoder = (LocalConnectorVerifyDecoder)channelFuture.channel().pipeline().get(LocalConnectorVerifyDecoder.NAME);
+        localConnectorVerifyDecoder.setVerifyStatus(LocalConnectorVerifyDecoder.WAIT_VERIFY_METHOD_STATUS);
     }
 
-    public void doWhenConnectFailed(RemoteAddress remoteAddress){
+    public void doWhenConnectFailed(){
         group.schedule(new Runnable() {
             @Override
             public void run() {
                 logger.info("重连连接...");
                 doConnect(remoteAddress.getHost(),remoteAddress.getPort());
             }
-        },10, TimeUnit.SECONDS);
+        },5, TimeUnit.SECONDS);
 
     }
 
@@ -80,13 +80,8 @@ public class LocalConnector extends AbstractConnector {
         this.channelFuture.channel().writeAndFlush(bytes);
     }
 
-    private void start() {
-        byte [] bytes = new byte[3];
-        bytes[0] = 0x01;
-        bytes[1] = 0x01;
-        bytes[2] = 0x02;
-        this.write(bytes);
-        this.clientVerifyDecoder.setVerifyStatus(ClientVerifyDecoder.WAIT_VERIFY_METHOD_STATUS);
+    public void start() {
+        doConnect();
     }
 
     private static class ConnectResultListener implements ChannelFutureListener{
@@ -106,8 +101,8 @@ public class LocalConnector extends AbstractConnector {
                 logger.info("connect to {} successfully",future.channel().remoteAddress());
                 localConnector.doWhenConnected();
             }else {
-                logger.info("connect to [{}:{}] failed",remoteAddress.getHost(),remoteAddress.getPort());
-                localConnector.doWhenConnectFailed(remoteAddress);
+                logger.info("failed to connect to [{}:{}] ",remoteAddress.getHost(),remoteAddress.getPort());
+                localConnector.doWhenConnectFailed();
             }
         }
 

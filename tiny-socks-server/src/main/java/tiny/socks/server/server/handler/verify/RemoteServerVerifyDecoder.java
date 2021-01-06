@@ -1,11 +1,11 @@
-package tiny.socks.server.handler.verify;
+package tiny.socks.server.server.handler.verify;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tiny.socks.base.server.Server;
 import tiny.socks.base.utils.NumberUtil;
 
 import java.nio.charset.StandardCharsets;
@@ -18,9 +18,11 @@ import java.util.List;
  * @date: 2021/1/3 12:21
  * @Email:pfxuchn@gmail.com
  */
-public class ServerVerifyDecoder extends ByteToMessageDecoder {
+public class RemoteServerVerifyDecoder extends ByteToMessageDecoder {
 
-    private static final Logger logger = LoggerFactory.getLogger(ServerVerifyDecoder.class);
+    public static final String NAME = "remoteServerVerifyDecoder";
+
+    private static final Logger logger = LoggerFactory.getLogger(RemoteServerVerifyDecoder.class);
 
     private static final int WAIT_VERIFY_STATUS = 0;
 
@@ -30,7 +32,7 @@ public class ServerVerifyDecoder extends ByteToMessageDecoder {
 
     private int verifyStatus;
 
-    public ServerVerifyDecoder(){
+    public RemoteServerVerifyDecoder(){
         this.verifyStatus = WAIT_VERIFY_STATUS;
     }
 

@@ -7,6 +7,8 @@ package tiny.socks.base;
  */
 public interface LifeCycle {
 
+    void start();
+
     void shutdown();
 
 }

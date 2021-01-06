@@ -1,11 +1,14 @@
 package tiny.socks.base.connector;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.*;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tiny.socks.base.BaseChannelInitializer;
 import tiny.socks.base.LifeCycle;
 
 import java.util.ArrayList;
@@ -18,6 +21,8 @@ import java.util.List;
  */
 public abstract class AbstractConnector implements Connector, LifeCycle {
 
+    private static final Logger logger = LoggerFactory.getLogger(AbstractConnector.class);
+
     protected final EventLoopGroup group;
 
     protected AbstractConnector() {
@@ -28,7 +33,7 @@ public abstract class AbstractConnector implements Connector, LifeCycle {
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.group(group)
                 .channel(NioSocketChannel.class)
-                .handler(new ConnectorChannelInitializer(this.loadHandlers()));
+                .handler(new BaseChannelInitializer(this.loadHandlers()));
         return bootstrap.connect(host, port);
     }
 
@@ -48,19 +53,4 @@ public abstract class AbstractConnector implements Connector, LifeCycle {
 
     protected abstract void addChannelHandlers(List<ChannelHandler> channelHandlers);
 
-    private static class ConnectorChannelInitializer extends ChannelInitializer<NioSocketChannel> {
-
-        private final List<ChannelHandler> channelHandlers;
-
-        public ConnectorChannelInitializer(List<ChannelHandler> channelHandlers){
-            this.channelHandlers = channelHandlers;
-        }
-
-        @Override
-        protected void initChannel(NioSocketChannel nioSocketChannel) throws Exception {
-            for (ChannelHandler channelHandler:this.channelHandlers){
-                nioSocketChannel.pipeline().addLast(channelHandler);
-            }
-        }
-    }
 }

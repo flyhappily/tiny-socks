@@ -1,5 +1,7 @@
 package tiny.socks.client;
 
+import tiny.socks.client.connector.LocalConnector;
+
 /**
  * @author: pf_xu
  * @date: 2021/1/2 23:19
@@ -7,6 +9,6 @@ package tiny.socks.client;
  */
 public class Client {
 
-
+    private LocalConnector localConnector;
 
 }

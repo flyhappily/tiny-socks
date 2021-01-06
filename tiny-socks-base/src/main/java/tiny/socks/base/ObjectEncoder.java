@@ -1,4 +1,4 @@
-package tiny.socks.base.encoder;
+package tiny.socks.base;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;

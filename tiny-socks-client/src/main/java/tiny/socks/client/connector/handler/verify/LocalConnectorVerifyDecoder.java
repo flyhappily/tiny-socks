@@ -1,4 +1,4 @@
-package tiny.socks.client.handler.verify;
+package tiny.socks.client.connector.handler.verify;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -16,9 +16,11 @@ import java.util.List;
  * @date: 2021/1/3 12:37
  * @Email:pfxuchn@gmail.com
  */
-public class ClientVerifyDecoder extends ByteToMessageDecoder {
+public class LocalConnectorVerifyDecoder extends ByteToMessageDecoder {
 
-    private static final Logger logger = LoggerFactory.getLogger(ClientVerifyDecoder.class);
+    public static final String NAME = "localConnectorVerifyDecoder";
+
+    private static final Logger logger = LoggerFactory.getLogger(LocalConnectorVerifyDecoder.class);
 
     public static final int WAIT_VERIFY_STATUS = 0;
 
@@ -38,12 +40,16 @@ public class ClientVerifyDecoder extends ByteToMessageDecoder {
     private final String password = "123";
 
 
-    public ClientVerifyDecoder(){
+    public LocalConnectorVerifyDecoder(){
         this.verifyStatus = WAIT_VERIFY_STATUS;
     }
 
     public void setVerifyStatus(int verifyStatus) {
         this.verifyStatus = verifyStatus;
+    }
+
+    public int getVerifyStatus() {
+        return verifyStatus;
     }
 
     @Override

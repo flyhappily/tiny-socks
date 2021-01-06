@@ -1,4 +1,5 @@
-## 验证协议(模仿socks)
+## 验证协议(模仿socks)--构建server和client之间的通道
+
 ### 第一步 client向server发送
 |VER|NMETHODS|METHODS|
 |:-----:|:-----:|:-----:|
@@ -38,18 +39,46 @@ RESULT 验证结果
 
 ## 数据传输协议
 
-|  TYPE  |     TARGRT      |  PORT   | LENGTH  |      DATA       |
-| :----: | :-------------: | :-----: | :-----: | :-------------: |
-| 1 byte | Variable length | 2 bytes | 2 bytes | Variable length |
+|LENGTH| DATA |
+|:---:| :---: |
+|2 bytes| Variable length |
 
-- TYPE：TARGRT类型
+### Data段
+
+#### 心跳包 (DATA TYPE：0x01)
+
+| DATA TYPE |
+| :-------: |
+|   1byte   |
+
+#### 指令 (DATA TYPE ：0x02)
+
+##### 客户端给服务端发送连接远程指令
+
+|DATA TYPE|  TARGRT TYPE  |     TARGRT      |  PORT   | LOCAL PORT |
+|:----:| :----: | :-------------: | :-----: | :--------: |
+|1 byte| 1 byte | Variable length | 2 bytes |  2 bytes   |
+
+- TARGRT TYPE：TARGRT类型
   - 0x00：IP v4
   - 0x01：域名（第一个字节为域名长度）
   - 0x02：IP v6
-
 - TARGRT：HOST
-
 - PORT：端口
+- LOCAL PORT: 应用连接client的本地端口
 
-- LENGTH：数据长度
+##### 服务端给客户端发送连接结果
+
+|DATA TYPE|   RESULT  | LOCAL PORT |
+|:----:|:-------------: | :--------: |
+|1 byte| 1 byte |  2 bytes   |
+
+- RESULT
+  - 0x01: 连接成功
+
+#### 数据 (DATA TYPE ：0x03)
+
+| DATA TYPE | LOCAL PORT | RESULT |
+| :-------: | :--------: | :----: |
+|  1 byte   |  2 bytes   | 1 byte |
 

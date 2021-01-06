@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class BaseChannelInitializer extends ChannelInitializer<NioSocketChannel> {
 
-    public static final String FIELD_NAME = "NAME";
+    public static final String HANDLER_NAME_FIELD = "NAME";
 
     private static final Logger logger = LoggerFactory.getLogger(BaseChannelInitializer.class);
 
@@ -31,7 +31,7 @@ public class BaseChannelInitializer extends ChannelInitializer<NioSocketChannel>
         for (ChannelHandler channelHandler:this.channelHandlers){
             String name = null;
             try {
-                Field field = channelHandler.getClass().getDeclaredField(FIELD_NAME);
+                Field field = channelHandler.getClass().getDeclaredField(HANDLER_NAME_FIELD);
                 name = (String)field.get(channelHandler);
                 if(name==null){
                     throw new NullPointerException("name is null");

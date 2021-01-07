@@ -1,12 +1,12 @@
 # 数据传输协议
 
-data packet   （max length ）
+packed data   （max length ）
 
-|LENGTH| BODY |
+|LENGTH| data |
 |:---:| :---: |
 |2 bytes| Variable length |
 
-## BODY段
+## DATA段 （DATA TYPE + BODY）
 
 ### 心跳包 (DATA TYPE：0x01)
 

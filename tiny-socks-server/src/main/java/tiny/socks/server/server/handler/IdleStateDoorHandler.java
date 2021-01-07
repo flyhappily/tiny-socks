@@ -21,7 +21,6 @@ public class IdleStateDoorHandler extends ChannelDuplexHandler {
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if(evt instanceof IdleStateEvent){
             logger.debug("捕获验证超时时间");
-            //ctx.close();
             super.userEventTriggered(ctx, evt);
         }
 

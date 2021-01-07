@@ -5,8 +5,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tiny.socks.base.server.Server;
-import tiny.socks.base.utils.NumberUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -67,9 +65,10 @@ public class RemoteServerVerifyDecoder extends ByteToMessageDecoder {
                 }
                 version = in.readByte();
                 byte method = in.readByte();
-                byte [] lengthBytes = new byte[2];
-                in.readBytes(lengthBytes);
-                short length = NumberUtil.bytesToShort(lengthBytes);
+//                byte [] lengthBytes = new byte[2];
+//                in.readBytes(lengthBytes);
+//                short length = NumberUtil.bytesToShort(lengthBytes);
+                int length = in.readShort();
                 if(in.readableBytes()<length){
                     in.clear();
                     return;

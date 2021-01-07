@@ -76,12 +76,22 @@ public class LocalConnector extends AbstractConnector {
 
     }
 
-    protected void write (byte[] bytes){
+    public void write (byte[] bytes){
         this.channelFuture.channel().writeAndFlush(bytes);
     }
 
     public void start() {
         doConnect();
+    }
+
+    public boolean isTunnelActive(){
+        if(channelFuture!=null && channelFuture.channel() != null && channelFuture.channel().isActive()){
+            LocalConnectorVerifyDecoder localConnectorVerifyDecoder = (LocalConnectorVerifyDecoder)channelFuture.channel().pipeline().get(LocalConnectorVerifyDecoder.NAME);
+            if(localConnectorVerifyDecoder.getVerifyStatus()==LocalConnectorVerifyDecoder.VERIFIED_STATUS){
+                return true;
+            }
+        }
+        return false;
     }
 
     private static class ConnectResultListener implements ChannelFutureListener{

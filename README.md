@@ -10,7 +10,7 @@ Tiny socks proxy
 ##模块
 
 ### tiny-socks-base
-通用的类
+通用模块
 
 ### tiny-socks-client
 客户端

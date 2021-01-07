@@ -33,10 +33,14 @@ public class DataPacket {
 
     public static class DataType{
 
+        private DataType(){
+
+        }
+
         /**
          * 验证中
          */
-        public static final byte verifying = 0x02;
+        public static final byte VERIFYING = 0x02;
     }
 
 }

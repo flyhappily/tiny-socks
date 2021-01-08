@@ -21,8 +21,6 @@ import java.util.List;
  */
 public abstract class AbstractConnector implements Connector, LifeCycle {
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractConnector.class);
-
     protected final EventLoopGroup group;
 
     protected AbstractConnector() {

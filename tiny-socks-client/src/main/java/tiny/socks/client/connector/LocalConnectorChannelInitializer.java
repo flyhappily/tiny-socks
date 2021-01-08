@@ -26,9 +26,9 @@ public class LocalConnectorChannelInitializer extends BaseChannelInitializer {
 
     @Override
     protected void loadChannelHandlers(List<ChannelHandler> channelHandlers) {
+        channelHandlers.add(new DataPacketEncoder());
         channelHandlers.add(new IdleStateHandler(0,0,5));
         channelHandlers.add(new LocalIdleStateHandler(localConnector));
-        channelHandlers.add(new DataPacketEncoder());
         channelHandlers.add(new UnpackDecoder());
         channelHandlers.add(new DataPacketDecoder());
         channelHandlers.add(new LocalConnectorVerifyDecoder());

@@ -1,6 +1,6 @@
 package tiny.socks.server;
 
-import tiny.socks.server.server.RemoteServer;
+import tiny.socks.server.server.Server;
 
 /**
  * @author: pf_xu
@@ -10,7 +10,7 @@ import tiny.socks.server.server.RemoteServer;
 public class ServerTest {
 
     public static void main(String[] args) {
-        RemoteServer remoteServer = new RemoteServer();
-        remoteServer.start();
+        Server server = new Server();
+        server.start();
     }
 }

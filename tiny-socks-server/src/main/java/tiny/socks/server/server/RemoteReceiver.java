@@ -3,11 +3,8 @@ package tiny.socks.server.server;
 import io.netty.channel.ChannelHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tiny.socks.base.BaseChannelInitializer;
-import tiny.socks.base.DataPacketDecoder;
-import tiny.socks.base.DataPacketEncoder;
-import tiny.socks.base.UnpackDecoder;
-import tiny.socks.base.server.AbstractServer;
+import tiny.socks.base.*;
+import tiny.socks.base.receiver.AbstractReceiver;
 import tiny.socks.server.server.handler.verify.RemoteServerVerifyDecoder;
 
 import java.util.List;
@@ -17,9 +14,15 @@ import java.util.List;
  * @date: 2021/1/2 23:19
  * @Email:pfxuchn@gmail.com
  */
-public class RemoteServer  extends AbstractServer {
+public class RemoteReceiver extends AbstractReceiver {
 
-    private static final Logger logger = LoggerFactory.getLogger(RemoteServer.class);
+    private static final Logger logger = LoggerFactory.getLogger(RemoteReceiver.class);
+
+    private final Server server;
+
+    public RemoteReceiver(Server server) {
+        this.server = server;
+    }
 
     @Override
     protected BaseChannelInitializer getBaseChannelInitializer() {
@@ -30,7 +33,10 @@ public class RemoteServer  extends AbstractServer {
                 channelHandlers.add(new UnpackDecoder());
                 channelHandlers.add(new DataPacketDecoder());
                 channelHandlers.add(new RemoteServerVerifyDecoder());
+                channelHandlers.add(new IdleStatePacketHandler());
+
             }
         };
     }
+
 }

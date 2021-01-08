@@ -10,9 +10,9 @@ packed data   （max length ）
 
 ### 心跳包 (DATA TYPE：0x01)
 
-| DATA TYPE |
-| :-------: |
-|   1byte   |
+| DATA TYPE | data |
+| :-------: |:-------:|
+|   1byte   |1byte|
 
 ### 验证指令 (DATA TYPE ：0x02)     验证协议(模仿socks)--构建server和client之间的通道
 

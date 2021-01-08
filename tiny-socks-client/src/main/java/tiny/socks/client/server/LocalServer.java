@@ -35,10 +35,6 @@ public class LocalServer implements LifeCycle {
         return this;
     }
 
-    @Override
-    public void start() {
-
-    }
 
     @Override
     public void shutdown() {

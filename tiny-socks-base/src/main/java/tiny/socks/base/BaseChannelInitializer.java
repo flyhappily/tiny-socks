@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,21 +15,22 @@ import java.util.List;
  * @date: 2021/1/6 19:45
  * @Email:pfxuchn@gmail.com
  */
-public class BaseChannelInitializer extends ChannelInitializer<NioSocketChannel> {
+public abstract class BaseChannelInitializer extends ChannelInitializer<NioSocketChannel> {
 
     public static final String HANDLER_NAME_FIELD = "NAME";
 
     private static final Logger logger = LoggerFactory.getLogger(BaseChannelInitializer.class);
 
-    private final List<ChannelHandler> channelHandlers;
-
-    public BaseChannelInitializer(List<ChannelHandler> channelHandlers){
-        this.channelHandlers = channelHandlers;
-    }
+    protected abstract void loadChannelHandlers(List<ChannelHandler> channelHandlers);
 
     @Override
     protected void initChannel(NioSocketChannel nioSocketChannel) throws Exception {
-        for (ChannelHandler channelHandler:this.channelHandlers){
+        List<ChannelHandler> channelHandlers = new ArrayList<>();
+        loadChannelHandlers(channelHandlers);
+        if (channelHandlers.isEmpty()) {
+            throw new IllegalArgumentException("channelHandlers should be configured correctly");
+        }
+        for (ChannelHandler channelHandler:channelHandlers){
             String name = null;
             try {
                 Field field = channelHandler.getClass().getDeclaredField(HANDLER_NAME_FIELD);

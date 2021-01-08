@@ -33,24 +33,15 @@ public abstract class AbstractConnector implements Connector, LifeCycle {
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.group(group)
                 .channel(NioSocketChannel.class)
-                .handler(new BaseChannelInitializer(this.loadHandlers()));
+                .handler(this.getBaseChannelInitializer());
         return bootstrap.connect(host, port);
     }
+
+    protected abstract BaseChannelInitializer getBaseChannelInitializer();
 
     @Override
     public void shutdown(){
         this.group.shutdownGracefully();
     }
-
-    private  List<ChannelHandler> loadHandlers(){
-        List<ChannelHandler> channelHandlers = new ArrayList<>();
-        this.addChannelHandlers(channelHandlers);
-        if (channelHandlers.isEmpty()) {
-            throw new IllegalArgumentException("channelHandlers should be configured correctly");
-        }
-        return channelHandlers;
-    }
-
-    protected abstract void addChannelHandlers(List<ChannelHandler> channelHandlers);
 
 }

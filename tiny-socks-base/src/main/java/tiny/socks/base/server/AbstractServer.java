@@ -40,23 +40,23 @@ public abstract class AbstractServer implements Server, LifeCycle {
         return this;
     }
 
-    protected abstract void addChannelHandlers(List<ChannelHandler> channelHandlers);
+    protected abstract BaseChannelInitializer getBaseChannelInitializer();
 
-    private List<ChannelHandler> loadChannelHandlers(){
-        List<ChannelHandler> channelHandlers = new ArrayList<>();
-        this.addChannelHandlers(channelHandlers);
-        if (channelHandlers.isEmpty()) {
-            throw new IllegalArgumentException("channelHandlers should be configured correctly");
-        }
-        return channelHandlers;
-    }
+//    private List<ChannelHandler> loadChannelHandlers(){
+//        List<ChannelHandler> channelHandlers = new ArrayList<>();
+//        this.addChannelHandlers(channelHandlers);
+//        if (channelHandlers.isEmpty()) {
+//            throw new IllegalArgumentException("channelHandlers should be configured correctly");
+//        }
+//        return channelHandlers;
+//    }
 
     @Override
     public final void start(){
         ServerBootstrap serverBootstrap = new ServerBootstrap();
         serverBootstrap.group(parentGroup,childGroup)
                 .channel(NioServerSocketChannel.class)
-                .childHandler(new BaseChannelInitializer(loadChannelHandlers()));
+                .childHandler(getBaseChannelInitializer());
         try {
             ChannelFuture future = serverBootstrap.bind(port).sync();
             logger.info("server is listening in port {}",port);
@@ -68,6 +68,8 @@ public abstract class AbstractServer implements Server, LifeCycle {
             this.parentGroup.shutdownGracefully();
         }
     }
+
+
 
     @Override
     public final void shutdown(){

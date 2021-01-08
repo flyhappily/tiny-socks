@@ -3,6 +3,7 @@ package tiny.socks.server.server;
 import io.netty.channel.ChannelHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tiny.socks.base.BaseChannelInitializer;
 import tiny.socks.base.DataPacketDecoder;
 import tiny.socks.base.DataPacketEncoder;
 import tiny.socks.base.UnpackDecoder;
@@ -21,15 +22,15 @@ public class RemoteServer  extends AbstractServer {
     private static final Logger logger = LoggerFactory.getLogger(RemoteServer.class);
 
     @Override
-    protected void addChannelHandlers(List<ChannelHandler> channelHandlers) {
-//        channelHandlers.add(new IdleStateHandler(5,5,0, TimeUnit.SECONDS));
-//        channelHandlers.add(new IdleStateDoorHandler());
-        channelHandlers.add(new DataPacketEncoder());
-        channelHandlers.add(new UnpackDecoder());
-        channelHandlers.add(new DataPacketDecoder());
-        channelHandlers.add(new RemoteServerVerifyDecoder());
-//
-
+    protected BaseChannelInitializer getBaseChannelInitializer() {
+        return new BaseChannelInitializer() {
+            @Override
+            protected void loadChannelHandlers(List<ChannelHandler> channelHandlers) {
+                channelHandlers.add(new DataPacketEncoder());
+                channelHandlers.add(new UnpackDecoder());
+                channelHandlers.add(new DataPacketDecoder());
+                channelHandlers.add(new RemoteServerVerifyDecoder());
+            }
+        };
     }
-
 }

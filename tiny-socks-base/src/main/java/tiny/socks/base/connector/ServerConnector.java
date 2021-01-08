@@ -1,6 +1,7 @@
 package tiny.socks.base.connector;
 
 import io.netty.channel.ChannelHandler;
+import tiny.socks.base.BaseChannelInitializer;
 
 import java.util.List;
 
@@ -13,12 +14,13 @@ public class ServerConnector extends AbstractConnector{
 
 
     @Override
-    protected void addChannelHandlers(List<ChannelHandler> channelHandlers) {
+    public void start() {
 
     }
 
-    @Override
-    public void start() {
 
+    @Override
+    protected BaseChannelInitializer getBaseChannelInitializer() {
+        return null;
     }
 }

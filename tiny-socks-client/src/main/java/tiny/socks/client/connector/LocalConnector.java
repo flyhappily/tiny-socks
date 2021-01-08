@@ -1,24 +1,16 @@
 package tiny.socks.client.connector;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandler;
-import io.netty.handler.timeout.IdleStateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tiny.socks.base.DataPacketDecoder;
-import tiny.socks.base.DataPacketEncoder;
-import tiny.socks.base.UnpackDecoder;
+import tiny.socks.base.BaseChannelInitializer;
 import tiny.socks.base.connector.AbstractConnector;
-import tiny.socks.base.ObjectEncoder;
 import tiny.socks.base.model.DataPacket;
 import tiny.socks.base.model.RemoteAddress;
-import tiny.socks.client.connector.handler.LocalIdleStateHandler;
 import tiny.socks.client.connector.handler.verify.LocalConnectorVerifyDecoder;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -40,13 +32,8 @@ public class LocalConnector extends AbstractConnector {
 
 
     @Override
-    protected void addChannelHandlers(List<ChannelHandler> channelHandlers) {
-//        channelHandlers.add(new IdleStateHandler(0,0,5));
-//        channelHandlers.add(new LocalIdleStateHandler(this));
-        channelHandlers.add(new DataPacketEncoder());
-        channelHandlers.add(new UnpackDecoder());
-        channelHandlers.add(new DataPacketDecoder());
-        channelHandlers.add(new LocalConnectorVerifyDecoder());
+    protected BaseChannelInitializer getBaseChannelInitializer() {
+        return new LocalConnectorChannelInitializer(this);
     }
 
     public void doConnect(){

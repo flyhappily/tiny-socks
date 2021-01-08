@@ -29,7 +29,7 @@ public class LocalIdleStateHandler extends ChannelDuplexHandler {
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
         logger.info("连接断开了,重新连接...");
-        localConnector.doConnect();
+        //localConnector.doConnect();
     }
 
     @Override

@@ -1,4 +1,4 @@
-# 数据传输协议
+# Tunnel 数据传输协议
 
 packed data   （max length ）
 
@@ -6,20 +6,20 @@ packed data   （max length ）
 |:---:| :---: |
 |2 bytes| Variable length |
 
-## DATA段 （DATA TYPE + BODY）
+## DATA段 （DATA TYPE + DATA CONTENT）
 
 ### 心跳包 (DATA TYPE：0x01)
 
-| DATA TYPE | data |
+| DATA TYPE | DATA CONTENT |
 | :-------: |:-------:|
-|   1byte   |1byte|
+|   0x01   |0x01|
 
-### 验证指令 (DATA TYPE ：0x02)     验证协议(模仿socks)--构建server和client之间的通道
+### 验证 (DATA TYPE ：0x02)     验证协议(模仿socks)--构建server和client之间的通道
 
 #### 第一步 client向server发送
 |DATA TYPE|VER|NMETHODS|METHODS|
 |:-----:|:-----:|:-----:|:-----:|
-|1byte |1 byte|1 byte|1 to 255 byte|
+|0x02 |1 byte|1 byte|1 to 255 byte|
  - VER 是指协议版本，目前是 0x01
  - NMETHODS 是指有多少个可以使用的方法，也就是客户端支持的认证方法，有以下值：
     - 0x00 NO AUTHENTICATION REQUIRED 不需要认证
@@ -31,13 +31,13 @@ packed data   （max length ）
 
 |DATA TYPE|  VER   | NMETHODS |    METHODS    |
 |:-----:| :----: | :------: | :-----------: |
-| 1 byte| 1 byte |  1 byte  | 1 to 255 byte |
+| 0x02 | 1 byte |  1 byte  | 1 to 255 byte |
 
 #### 第三步 client向server发送验证信息
 
 |DATA TYPE|  VER   | METHOD | LENGTH  |      DATA       |
 |:-----:| :----: | :----: | :-----: | :-------------: |
-| 1 byte| 1 byte | 1 byte | 2 bytes | Variable length |
+| 0x02 | 1 byte | 1 byte | 2 bytes | Variable length |
 
 - LENGTH 验证信息的长度
 - DATA验证信息数据
@@ -46,20 +46,40 @@ packed data   （max length ）
 
 |DATA TYPE|  VER   | RESULT |
 |:-----:| :----: | :----: |
-| 1 byte| 1 byte | 1 byte |
+| 0x02 | 1 byte | 1 byte |
 
 RESULT 验证结果
 
 - 0x01 认证成功
 - 0xFF 认证失败
 
-### 代理连接指令 (DATA TYPE ：0x03)
+### 通道通用数据 (DATA TYPE ：0x03)
 
-#### 客户端给服务端发送连接远程指令
+| DATA TYPE |  DATA CONTENT   |
+| :-------: | :-------------: |
+|   0x03    | Variable length |
 
-|DATA TYPE|  TARGRT TYPE  |     TARGRT      |  PORT   | LOCAL PORT |
-|:----:| :----: | :-------------: | :-----: | :--------: |
-|1 byte| 1 byte | Variable length | 2 bytes |  2 bytes   |
+| DATA TYPE | DATA HEADER |    DATA BODY    |
+| :-------: | :---------: | :-------------: |
+|   0x03    |   3 bytes   | Variable length |
+
+DATA CONTENT暂时限制最大1024*10个字节
+
+DATA HEADER = CMD + LOCAL PORT
+
+#### Relay
+
+| DATA TYPE | CMD  | LOCAL PORT |    DATA BODY    |
+| :-------: | :--: | :--------: | :-------------: |
+|   0x03    | 0x00 |  2 bytes   | Variable length |
+
+#### Connect
+
+##### 客户端给服务端发送连接远程指令
+
+|DATA TYPE|CMD|LOCAL PORT|  TARGRT TYPE  |     TARGRT      |  PORT   |
+|:----:| :----: | :-------------: | :-----: | :--------: |------|
+|0x03|0x01|2 bytes| 1 byte | Variable length | 2 bytes |
 
 - TARGRT TYPE：TARGRT类型
   - 0x00：IP v4
@@ -69,21 +89,14 @@ RESULT 验证结果
 - PORT：端口
 - LOCAL PORT: 应用连接client的本地端口
 
-#### 服务端给客户端发送连接结果
+##### 服务端给客户端发送连接结果
 
-|DATA TYPE|   RESULT  | LOCAL PORT |
-|:----:|:-------------: | :--------: |
-|1 byte| 1 byte |  2 bytes   |
+|DATA TYPE|CMD|LOCAL PORT|   RESULT  |
+|:----:| :--------: | :--------: | :--------: |
+|1 byte|0x01|2 bytes| 1 byte |
 
 - RESULT
   - 0x01: 连接成功
 
-### 数据 (DATA TYPE ：0x04)
+##### close
 
-| DATA TYPE | LOCAL PORT |      DATA       |
-| :-------: | :--------: | :-------------: |
-|  1 byte   |  2 bytes   | Variable length |
-
-DATA暂时限制最大1024*10个字节
-
-data_length <=  max_data_packet_length - 5

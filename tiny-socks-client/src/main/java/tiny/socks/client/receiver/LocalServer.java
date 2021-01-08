@@ -1,4 +1,4 @@
-package tiny.socks.client.server;
+package tiny.socks.client.receiver;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.EventLoopGroup;

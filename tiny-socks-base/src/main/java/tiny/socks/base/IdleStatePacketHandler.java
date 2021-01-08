@@ -19,8 +19,9 @@ public class IdleStatePacketHandler extends MessageToMessageDecoder<DataPacket> 
     
     @Override
     protected void decode(ChannelHandlerContext ctx, DataPacket msg, List<Object> out) throws Exception {
-        if(msg.getDataType()==0x01) {
-            logger.debug("收到心跳包，不处理。。。。。。。。");
+        if(msg.getDataType()==DataPacket.DataType.IDLE) {
+            logger.debug("收到心跳包，不处理，释放资源。。。。。。。。");
+            msg.getDataContent().release();
         }
         else {
             out.add(msg);

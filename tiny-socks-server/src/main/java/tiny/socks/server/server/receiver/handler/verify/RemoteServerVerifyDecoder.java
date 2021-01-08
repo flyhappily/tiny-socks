@@ -1,4 +1,4 @@
-package tiny.socks.server.server.handler.verify;
+package tiny.socks.server.server.receiver.handler.verify;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -40,14 +40,14 @@ public class RemoteServerVerifyDecoder extends MessageToMessageDecoder<DataPacke
     @Override
     protected void decode(ChannelHandlerContext ctx, DataPacket msg, List<Object> out) throws Exception {
 
-        if(this.verifyStatus!=VERIFIED_STATUS && msg.getDataType()!=0x02){
+        if(this.verifyStatus!=VERIFIED_STATUS && msg.getDataType()!=DataPacket.DataType.VERIFYING){
             this.fail(ctx,"未验证通过，就接收到数据包");
             return;
         }
 
-        if(msg.getDataType() == 0x02){
+        if(msg.getDataType() == DataPacket.DataType.VERIFYING){
 
-            ByteBuf in = msg.getBody();
+            ByteBuf in = msg.getDataContent();
 
             switch (verifyStatus) {
                 case WAIT_VERIFY_STATUS:
@@ -57,8 +57,8 @@ public class RemoteServerVerifyDecoder extends MessageToMessageDecoder<DataPacke
                     this.doWhenVerifyingStatus(ctx,in);
                     break;
                 case VERIFIED_STATUS:
-                    logger.info("验证通过，仍然收到验证数据包");
-                    out.add(in);
+                    logger.info("验证通过，仍然收到验证数据包，丢弃之");
+                    this.releaseByteBuf(in);
                     break;
                 default:
                     this.fail(ctx,"未匹配到合适的验证状态");

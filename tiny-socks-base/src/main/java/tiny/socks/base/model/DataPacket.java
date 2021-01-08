@@ -16,19 +16,19 @@ public class DataPacket {
 
     private final byte dataType;
 
-    private final ByteBuf body;
+    private final ByteBuf dataContent;
 
-    public DataPacket(byte dataType, ByteBuf body) {
+    public DataPacket(byte dataType, ByteBuf dataContent) {
         this.dataType = dataType;
-        this.body = body;
+        this.dataContent = dataContent;
     }
 
     public byte getDataType() {
         return dataType;
     }
 
-    public ByteBuf getBody() {
-        return body;
+    public ByteBuf getDataContent() {
+        return dataContent;
     }
 
     public static class DataType{
@@ -38,9 +38,21 @@ public class DataPacket {
         }
 
         /**
-         * 验证中
+         * 心跳数据
+         */
+        public static final byte IDLE = 0x01;
+
+        /**
+         * 验证数据
          */
         public static final byte VERIFYING = 0x02;
+
+        /**
+         * 通用数据
+         */
+        public static final byte COMMON = 0x03;
+
+
     }
 
 }

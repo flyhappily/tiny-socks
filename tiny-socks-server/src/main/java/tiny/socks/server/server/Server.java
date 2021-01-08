@@ -4,9 +4,8 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tiny.socks.server.server.receiver.RemoteReceiver;
 
-import java.nio.channels.Channel;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -18,14 +17,11 @@ public class Server {
 
     private static final Logger logger = LoggerFactory.getLogger(Server.class);
 
-    private final RemoteConnector remoteConnector;
-
     private final RemoteReceiver remoteReceiver;
 
     private ConcurrentHashMap<ChannelId, ChannelFuture> remoteChannelFutures;
 
     public Server() {
-        remoteConnector = new RemoteConnector(this);
         remoteReceiver = new RemoteReceiver(this);
     }
 

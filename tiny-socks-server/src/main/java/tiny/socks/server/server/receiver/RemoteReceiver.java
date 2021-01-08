@@ -1,11 +1,12 @@
-package tiny.socks.server.server;
+package tiny.socks.server.server.receiver;
 
 import io.netty.channel.ChannelHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tiny.socks.base.*;
 import tiny.socks.base.receiver.AbstractReceiver;
-import tiny.socks.server.server.handler.verify.RemoteServerVerifyDecoder;
+import tiny.socks.server.server.Server;
+import tiny.socks.server.server.receiver.handler.verify.RemoteServerVerifyDecoder;
 
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class RemoteReceiver extends AbstractReceiver {
                 channelHandlers.add(new DataPacketDecoder());
                 channelHandlers.add(new RemoteServerVerifyDecoder());
                 channelHandlers.add(new IdleStatePacketHandler());
-
+                channelHandlers.add(new DataPacketHandler());
             }
         };
     }

@@ -48,7 +48,7 @@ public class LocalConnectorVerifyDecoder extends MessageToMessageDecoder<DataPac
     @Override
     protected void decode(ChannelHandlerContext ctx, DataPacket msg, List<Object> out) throws Exception {
         byte dataType = msg.getDataType();
-        ByteBuf in = msg.getBody();
+        ByteBuf in = msg.getDataContent();
 
         if(verifyStatus != VERIFIED_STATUS && dataType != 0x02){
             this.fail(ctx,"数据包不对");

@@ -2,10 +2,7 @@ package tiny.socks.client.connector;
 
 import io.netty.channel.ChannelHandler;
 import io.netty.handler.timeout.IdleStateHandler;
-import tiny.socks.base.BaseChannelInitializer;
-import tiny.socks.base.DataPacketDecoder;
-import tiny.socks.base.DataPacketEncoder;
-import tiny.socks.base.UnpackDecoder;
+import tiny.socks.base.*;
 import tiny.socks.client.connector.handler.LocalIdleStateHandler;
 import tiny.socks.client.connector.handler.verify.LocalConnectorVerifyDecoder;
 
@@ -18,17 +15,16 @@ import java.util.List;
  */
 public class LocalConnectorChannelInitializer extends BaseChannelInitializer {
 
-    private final LocalConnector localConnector;
 
-    public LocalConnectorChannelInitializer(LocalConnector localConnector) {
-        this.localConnector = localConnector;
+    public LocalConnectorChannelInitializer(Module module) {
+        super(module);
     }
 
     @Override
     protected void loadChannelHandlers(List<ChannelHandler> channelHandlers) {
         channelHandlers.add(new DataPacketEncoder());
         channelHandlers.add(new IdleStateHandler(0,0,5));
-        channelHandlers.add(new LocalIdleStateHandler(localConnector));
+        channelHandlers.add(new LocalIdleStateHandler((LocalConnector)module));
         channelHandlers.add(new UnpackDecoder());
         channelHandlers.add(new DataPacketDecoder());
         channelHandlers.add(new LocalConnectorVerifyDecoder());

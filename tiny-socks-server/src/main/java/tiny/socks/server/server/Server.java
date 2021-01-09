@@ -1,12 +1,9 @@
 package tiny.socks.server.server;
 
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tiny.socks.server.server.connector.RemoteConnector;
 import tiny.socks.server.server.receiver.RemoteReceiver;
-
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author: pf_xu
@@ -19,23 +16,13 @@ public class Server {
 
     private final RemoteReceiver remoteReceiver;
 
-    private ConcurrentHashMap<ChannelId, ChannelFuture> remoteChannelFutures;
+    private final RemoteConnector remoteConnector;
 
     public Server() {
-        remoteReceiver = new RemoteReceiver(this);
+        remoteReceiver = (RemoteReceiver) new RemoteReceiver(this).port(7979);
+        remoteConnector = new RemoteConnector(this);
     }
 
-    public void registerChannelFuture(ChannelId channelId, ChannelFuture channelFuture){
-        remoteChannelFutures.put(channelId,channelFuture);
-    }
-
-    public void removeChannelFuture(ChannelId channelId){
-        remoteChannelFutures.remove(channelId);
-    }
-
-    public ChannelFuture getChannelFuture(ChannelId channelId){
-        return remoteChannelFutures.get(channelId);
-    }
 
     public void start(){
         remoteReceiver.start();

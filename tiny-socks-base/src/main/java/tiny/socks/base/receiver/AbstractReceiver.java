@@ -28,7 +28,6 @@ public abstract class AbstractReceiver implements Receiver, LifeCycle {
     protected AbstractReceiver() {
         this.parentGroup = new NioEventLoopGroup();
         this.childGroup = new NioEventLoopGroup();
-        this.port = 7979;
     }
 
     public AbstractReceiver port(int port){

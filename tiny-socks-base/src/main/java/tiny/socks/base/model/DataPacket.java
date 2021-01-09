@@ -31,28 +31,4 @@ public class DataPacket {
         return dataContent;
     }
 
-    public static class DataType{
-
-        private DataType(){
-
-        }
-
-        /**
-         * 心跳数据
-         */
-        public static final byte IDLE = 0x01;
-
-        /**
-         * 验证数据
-         */
-        public static final byte VERIFYING = 0x02;
-
-        /**
-         * 通用数据
-         */
-        public static final byte COMMON = 0x03;
-
-
-    }
-
 }

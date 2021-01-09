@@ -6,9 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tiny.socks.base.BaseChannelInitializer;
 import tiny.socks.base.connector.AbstractConnector;
+import tiny.socks.server.server.Server;
 import tiny.socks.server.server.connector.handler.ByteIn;
 import tiny.socks.server.server.connector.handler.HandlerByte;
-import tiny.socks.server.server.receiver.RemoteReceiver;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,19 +23,19 @@ public class RemoteConnector extends AbstractConnector {
 
     private static final Logger logger = LoggerFactory.getLogger(RemoteConnector.class);
 
-    private final RemoteReceiver remoteReceiver;
+    private final Server server;
 
     private  final ConcurrentHashMap<String, Channel> channels = new ConcurrentHashMap<>();
 
     private Channel TunnelChannel;
 
-    public RemoteConnector(RemoteReceiver remoteReceiver) {
-        this.remoteReceiver = remoteReceiver;
+    public RemoteConnector(Server server) {
+        this.server = server;
     }
 
     @Override
     protected BaseChannelInitializer getBaseChannelInitializer() {
-        return new BaseChannelInitializer() {
+        return new BaseChannelInitializer(this) {
             @Override
             protected void loadChannelHandlers(List<ChannelHandler> channelHandlers) {
                 channelHandlers.add(new ByteIn());

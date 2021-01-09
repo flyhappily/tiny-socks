@@ -77,7 +77,7 @@ DATA HEADER = CMD + LOCAL PORT
 
 ##### 客户端给服务端发送连接远程指令
 
-|DATA TYPE|CMD|LOCAL PORT|  TARGRT TYPE  |     TARGRT      |  PORT   |
+|DATA TYPE|CMD|LOCAL PORT|  TARGET TYPE  |    TARGET | TARGET PORT |
 |:----:| :----: | :-------------: | :-----: | :--------: |------|
 |0x03|0x01|2 bytes| 1 byte | Variable length | 2 bytes |
 
@@ -85,7 +85,7 @@ DATA HEADER = CMD + LOCAL PORT
   - 0x00：IP v4
   - 0x01：域名（第一个字节为域名长度）
   - 0x02：IP v6
-- TARGRT：HOST
+- TARGET：HOST
 - PORT：端口
 - LOCAL PORT: 应用连接client的本地端口
 

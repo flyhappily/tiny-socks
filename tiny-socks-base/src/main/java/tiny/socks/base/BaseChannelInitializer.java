@@ -17,6 +17,12 @@ import java.util.List;
  */
 public abstract class BaseChannelInitializer extends ChannelInitializer<NioSocketChannel> {
 
+    protected final Module module;
+
+    public BaseChannelInitializer(Module module) {
+        this.module = module;
+    }
+
     public static final String HANDLER_NAME_FIELD = "NAME";
 
     private static final Logger logger = LoggerFactory.getLogger(BaseChannelInitializer.class);

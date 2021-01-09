@@ -7,6 +7,7 @@ import io.netty.handler.codec.MessageToMessageDecoder;
 import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tiny.socks.base.constant.DataType;
 import tiny.socks.base.model.DataPacket;
 
 import java.nio.charset.StandardCharsets;
@@ -40,12 +41,12 @@ public class RemoteServerVerifyDecoder extends MessageToMessageDecoder<DataPacke
     @Override
     protected void decode(ChannelHandlerContext ctx, DataPacket msg, List<Object> out) throws Exception {
 
-        if(this.verifyStatus!=VERIFIED_STATUS && msg.getDataType()!=DataPacket.DataType.VERIFYING){
+        if(this.verifyStatus!=VERIFIED_STATUS && msg.getDataType()!=DataType.VERIFYING){
             this.fail(ctx,"未验证通过，就接收到数据包");
             return;
         }
 
-        if(msg.getDataType() == DataPacket.DataType.VERIFYING){
+        if(msg.getDataType() == DataType.VERIFYING){
 
             ByteBuf in = msg.getDataContent();
 
@@ -84,7 +85,7 @@ public class RemoteServerVerifyDecoder extends MessageToMessageDecoder<DataPacke
         resp.writeByte(0x01);
         resp.writeByte(0x01);
         resp.writeByte(0x01);
-        ctx.writeAndFlush(new DataPacket(DataPacket.DataType.VERIFYING,resp));
+        ctx.writeAndFlush(new DataPacket(DataType.VERIFYING,resp));
         logger.debug("给客户端响应支持的验证方法,version={},resp={}", version, resp);
         this.verifyStatus = VERIFYING_STATUS;
         this.releaseByteBuf(in);
@@ -109,7 +110,7 @@ public class RemoteServerVerifyDecoder extends MessageToMessageDecoder<DataPacke
         //校验成功
         result.writeByte(0x01);
         logger.debug("给客户端发送验证结果，result={}", result);
-        ctx.writeAndFlush(new DataPacket(DataPacket.DataType.VERIFYING,result));
+        ctx.writeAndFlush(new DataPacket(DataType.VERIFYING,result));
         this.verifyStatus = VERIFIED_STATUS;
         logger.info("verified, begin to transmit data remoteAddress:{},localAddress:{}"
                 , ctx.channel().remoteAddress(), ctx.channel().localAddress());

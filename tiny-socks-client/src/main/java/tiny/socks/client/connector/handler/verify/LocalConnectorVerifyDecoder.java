@@ -7,6 +7,7 @@ import io.netty.handler.codec.MessageToMessageDecoder;
 import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tiny.socks.base.constant.DataType;
 import tiny.socks.base.model.DataPacket;
 import tiny.socks.base.utils.NumberUtil;
 
@@ -54,7 +55,7 @@ public class LocalConnectorVerifyDecoder extends MessageToMessageDecoder<DataPac
             this.fail(ctx,"数据包不对");
         }
 
-        if(dataType == DataPacket.DataType.VERIFYING){
+        if(dataType == DataType.VERIFYING){
             switch (verifyStatus){
                 case WAIT_VERIFY_STATUS:
                     logger.error("错误数据为：{}",msg);

@@ -4,6 +4,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tiny.socks.base.constant.DataType;
 import tiny.socks.base.model.DataPacket;
 
 import java.util.List;
@@ -19,9 +20,8 @@ public class IdleStatePacketHandler extends MessageToMessageDecoder<DataPacket> 
     
     @Override
     protected void decode(ChannelHandlerContext ctx, DataPacket msg, List<Object> out) throws Exception {
-        if(msg.getDataType()==DataPacket.DataType.IDLE) {
-            logger.debug("收到心跳包，不处理，释放资源。。。。。。。。");
-            msg.getDataContent().release();
+        if(msg.getDataType()== DataType.IDLE) {
+            logger.debug("收到心跳包，不处理，释放资源。。。。。。。。{}",msg.getDataContent().release());
         }
         else {
             out.add(msg);

@@ -1,14 +1,15 @@
 package tiny.socks.server.server.receiver;
 
-import io.netty.channel.ChannelHandler;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tiny.socks.base.*;
+import tiny.socks.base.BaseChannelInitializer;
+import tiny.socks.base.model.action.ConnectActionData;
 import tiny.socks.base.receiver.AbstractReceiver;
 import tiny.socks.server.server.Server;
-import tiny.socks.server.server.receiver.handler.verify.RemoteServerVerifyDecoder;
 
-import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author: pf_xu
@@ -21,23 +22,19 @@ public class RemoteReceiver extends AbstractReceiver {
 
     private final Server server;
 
+    private final ConcurrentHashMap<ChannelId, Channel> tunnels = new ConcurrentHashMap<>();
+
     public RemoteReceiver(Server server) {
         this.server = server;
     }
 
     @Override
     protected BaseChannelInitializer getBaseChannelInitializer() {
-        return new BaseChannelInitializer() {
-            @Override
-            protected void loadChannelHandlers(List<ChannelHandler> channelHandlers) {
-                channelHandlers.add(new DataPacketEncoder());
-                channelHandlers.add(new UnpackDecoder());
-                channelHandlers.add(new DataPacketDecoder());
-                channelHandlers.add(new RemoteServerVerifyDecoder());
-                channelHandlers.add(new IdleStatePacketHandler());
-                channelHandlers.add(new DataPacketHandler());
-            }
-        };
+        return new RemoteReceiverChannelInitializer(this);
+    }
+
+    public void connectRemote(Channel tunnelChannel, ConnectActionData connectActionData){
+
     }
 
 }
